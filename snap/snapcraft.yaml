@@ -14,6 +14,16 @@ description: |
   The default output format is RFC-2822 compliant with simple integers so parsing is easy.
   You may also display delimiters to make reading of large numbers easier, or you may use a "human readable" format that displays values using SI prefixes to keep the numberic value small.
 
+  # SSH Keys Interface
+
+  By default, the snap interface for SSH keys is not connected.
+  In order to use SSH keys with this snap, you will need to connect the `ssh-keys` interface manually.
+  You can do this after installation by running:
+
+  ```bash
+  snap connect sshping:ssh-keys
+  ```
+
   This is a third-party snap, not officially supported by the original author..
   Find the original source code at https://github.com/spook/sshping
 
@@ -43,10 +53,18 @@ parts:
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
       cp bin/sshping $SNAPCRAFT_PART_INSTALL/bin/sshping
       craftctl default
+    
+  sshping-wrapper:
+    plugin: nil
+    source: .
+    override-build: |
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp $SNAPCRAFT_PART_SRC/snap/sshping-wrapper $SNAPCRAFT_PART_INSTALL/bin/sshping-wrapper
+      chmod +x $SNAPCRAFT_PART_INSTALL/bin/sshping-wrapper
 
 apps:
   sshping:
-    command: bin/sshping
+    command: bin/sshping-wrapper
     plugs:
       - network
       - network-bind

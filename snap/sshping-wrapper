@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# check if ssh-keys interface is connected
+if ! snapctl is-connected ssh-keys; then
+  echo "Warning: The ssh-keys interface is not connected. Please connect it to use SSH Key authentication."
+  echo "You can connect it using the command: snap connect sshping:ssh-keys"
+  sleep 3;
+fi
+
+$SNAP/bin/sshping "$@"
