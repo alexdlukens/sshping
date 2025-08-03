@@ -1,0 +1,49 @@
+name: sshping # you probably want to 'snapcraft register <name>'
+base: core24 # the base snap is the execution environment for this snap
+version: '0.1' # just for humans, typically '1.2+git' or '1.3.2'
+summary: "Measure character-echo latency and bandwidth for an interactive ssh session"
+description: |
+  Use this utility to test the performance of interactive ssh sessions or scp file transfers.
+  It uses ssh to log into a remote system, then runs two tests: the first test sends one character at a time, waiting for each character to be returned while it records the latency time for each.
+  The second test sends a dummy file over scp to /dev/null on the remote system.
+
+  For the echo test, you may specify a character count limit (-c) or a test time limit (-t), and also the command (-e) used on the remote system that echoes characters back.
+
+  For the speed test, you may specify the number of megabytes to send (-s) and the target location for the copies (-z).
+
+  The default output format is RFC-2822 compliant with simple integers so parsing is easy.
+  You may also display delimiters to make reading of large numbers easier, or you may use a "human readable" format that displays values using SI prefixes to keep the numberic value small.
+
+  This is a third-party snap, not officially supported by the original author..
+  Find the original source code at https://github.com/spook/sshping
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+license: MIT
+
+parts:
+  sshping:
+    # See 'snapcraft plugins'
+    plugin: nil
+    source: https://github.com/spook/sshping.git
+    source-type: git
+    build-packages:
+      - gcc
+      - g++
+      - libssh-dev
+      - make
+    stage-packages:
+      - libssh-4
+    override-build: |
+      make sshping
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp bin/sshping $SNAPCRAFT_PART_INSTALL/bin/sshping
+      craftctl default
+
+apps:
+  sshping:
+    command: bin/sshping
+    plugs:
+      - network
+      - network-bind
+      - ssh-keys
